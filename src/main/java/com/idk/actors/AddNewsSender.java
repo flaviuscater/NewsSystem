@@ -9,42 +9,39 @@ import org.springframework.stereotype.Component;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.idk.constants.NewsConstants.READ_NEWS_EVENT;
+import static com.idk.constants.NewsConstants.ADD_NEWS_EVENT;
 
 @Component
-public class NewsReadSender {
+public class AddNewsSender {
 
     @Autowired
     JmsTemplate jmsTemplate;
 
     @Autowired
-    @Qualifier("readNewsResponseDestination")
-    private Destination requestedReadNewsDestination;
+    @Qualifier("addNewsResponseDestination")
+    Destination addNewsResponseDestination;
 
-    public NewsReadSender() {
-    }
-
-    public String readNews(String newsId) throws JMSException {
+    public String addNews(News news) throws JMSException {
         final AtomicReference<Message> message = new AtomicReference<>();
 
-        jmsTemplate.convertAndSend(READ_NEWS_EVENT, newsId, messagePostProcessor -> {
+        jmsTemplate.convertAndSend(ADD_NEWS_EVENT, news, messagePostProcessor -> {
             message.set(messagePostProcessor);
             return messagePostProcessor;
         });
 
         String messageId = message.get().getJMSMessageID();
-        System.out.format("Subscribing for news with category=%s with MessageId=%s\n",
-                newsId, messageId);
+        System.out.format("Adding news: %s with MessageId=%s\n",
+                news, messageId);
 
         return messageId;
     }
 
-    public News receiveReadNews(String correlationId) {
-        News result = (News) jmsTemplate.receiveSelectedAndConvert(requestedReadNewsDestination, "JMSCorrelationID = '" + correlationId + "'");
+    public String receiveAddNewsResponse(String correlationId) {
+        String result = (String) jmsTemplate.receiveSelectedAndConvert(addNewsResponseDestination, "JMSCorrelationID = '" + correlationId + "'");
         System.out.format("receive Status=%s for CorrelationId=%s\n", result, correlationId);
         return result;
     }
+
 }

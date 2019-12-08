@@ -13,7 +13,7 @@ import javax.jms.Message;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.idk.constants.NewsConstants.DESTINATION_NEWS_SUBSCRIBE;
+import static com.idk.constants.NewsConstants.SUBSCRIBE_NEWS_EVENT;
 
 @Component
 public class NewsSubscribeSender {
@@ -22,7 +22,7 @@ public class NewsSubscribeSender {
     JmsTemplate jmsTemplate;
 
     @Autowired
-    @Qualifier("receivedSubscriptionsDestination")
+    @Qualifier("subscribeNewsResponseDestination")
     private Destination receivedSubscriptionsDestination;
 
     public NewsSubscribeSender() {
@@ -31,7 +31,7 @@ public class NewsSubscribeSender {
     public String subscribeToNews(Category category) throws JMSException {
         final AtomicReference<Message> message = new AtomicReference<>();
 
-        jmsTemplate.convertAndSend(DESTINATION_NEWS_SUBSCRIBE, category, messagePostProcessor -> {
+        jmsTemplate.convertAndSend(SUBSCRIBE_NEWS_EVENT, category, messagePostProcessor -> {
             message.set(messagePostProcessor);
             return messagePostProcessor;
         });

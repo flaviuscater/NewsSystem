@@ -12,7 +12,6 @@ import static com.idk.constants.NewsConstants.*;
 @Configuration
 public class SenderConfig {
 
-
     @Bean
     public ActiveMQConnectionFactory senderConnectionFactory() {
         System.setProperty("org.apache.activemq.SERIALIZABLE_PACKAGES", "*");
@@ -24,18 +23,18 @@ public class SenderConfig {
         return activeMQConnectionFactory;
     }
 
-//    @Bean
-//    public Destination subscribeNewsDestination() {
-//        return new ActiveMQQueue(DESTINATION_NEWS_SUBSCRIBE);
-//    }
-
     @Bean
-    public Destination receivedSubscriptionsDestination() {
+    public Destination subscribeNewsResponseDestination() {
         return new ActiveMQQueue(DESTINATION_RECEIVED_SUBSCRIPTIONS);
     }
 
     @Bean
-    public Destination requestedReadNewsDestination() {
+    public Destination readNewsResponseDestination() {
+        return new ActiveMQQueue(DESTINATION_REQUESTED_NEWS_READ);
+    }
+
+    @Bean
+    public Destination addNewsResponseDestination() {
         return new ActiveMQQueue(DESTINATION_REQUESTED_NEWS_READ);
     }
 }

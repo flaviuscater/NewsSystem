@@ -16,10 +16,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.idk.constants.NewsConstants.DESTINATION_NEWS_SUBSCRIBE;
+import static com.idk.constants.NewsConstants.SUBSCRIBE_NEWS_EVENT;
 
 @Service
-public class SubscribeNewsService {
+public class SubscribeNewsReceiver {
 
     @Autowired
     NewsRepository newsRepository;
@@ -28,10 +28,10 @@ public class SubscribeNewsService {
     JmsTemplate jmsTemplate;
 
     @Autowired
-    @Qualifier("receivedSubscriptionsDestination")
+    @Qualifier("subscribeNewsResponseDestination")
     private Destination receivedSubscriptionsDestination;
 
-    @JmsListener(destination = DESTINATION_NEWS_SUBSCRIBE, containerFactory = "myFactory")
+    @JmsListener(destination = SUBSCRIBE_NEWS_EVENT, containerFactory = "myFactory")
     public void subscribeToNewsEventHandler(Category category, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         System.out.format("Received subscribe to news with category='%s' with MessageId='%s'\n", category, messageId);
 

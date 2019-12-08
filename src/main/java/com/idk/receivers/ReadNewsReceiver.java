@@ -7,16 +7,17 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.JmsHeaders;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.stereotype.Service;
 
 import javax.jms.Destination;
 import javax.jms.ObjectMessage;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-import static com.idk.constants.NewsConstants.DESTINATION_READ_NEWS;
+import static com.idk.constants.NewsConstants.READ_NEWS_EVENT;
 
-public class ReadNewsService {
+@Service
+public class ReadNewsReceiver {
 
     @Autowired
     NewsRepository newsRepository;
@@ -25,10 +26,10 @@ public class ReadNewsService {
     JmsTemplate jmsTemplate;
 
     @Autowired
-    @Qualifier("requestedReadNewsDestination")
+    @Qualifier("readNewsResponseDestination")
     private Destination requestedReadNewsDestination;
 
-    @JmsListener(destination = DESTINATION_READ_NEWS, containerFactory = "myFactory")
+    @JmsListener(destination = READ_NEWS_EVENT, containerFactory = "myFactory")
     public void readNewsEventHandler(String newsId, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         List<News> newsList = newsRepository.getNewsList();
         Optional<News> foundNews = newsList.stream()
@@ -36,6 +37,8 @@ public class ReadNewsService {
 
         // increase readers count
         foundNews.ifPresent(news -> newsRepository.increaseNewsReadCount(news.getId()));
+
+        System.out.println("Readers count: \n" + newsRepository.getReadersCount(newsId));
 
         jmsTemplate.send(requestedReadNewsDestination, messageCreator -> {
             ObjectMessage message = messageCreator.createObjectMessage();
