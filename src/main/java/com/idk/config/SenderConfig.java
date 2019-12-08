@@ -24,13 +24,18 @@ public class SenderConfig {
         return activeMQConnectionFactory;
     }
 
+//    @Bean
+//    public Destination subscribeNewsDestination() {
+//        return new ActiveMQQueue(DESTINATION_NEWS_SUBSCRIBE);
+//    }
+
     @Bean
-    public Destination subscribeNewsDestination() {
-        return new ActiveMQQueue(DESTINATION_NEWS_SUBSCRIBE);
+    public Destination receivedSubscriptionsDestination() {
+        return new ActiveMQQueue(DESTINATION_RECEIVED_SUBSCRIPTIONS);
     }
 
     @Bean
-    public Destination statusDestination() {
-        return new ActiveMQQueue(DESTINATION_STATUS);
+    public Destination requestedReadNewsDestination() {
+        return new ActiveMQQueue(DESTINATION_REQUESTED_NEWS_READ);
     }
 }

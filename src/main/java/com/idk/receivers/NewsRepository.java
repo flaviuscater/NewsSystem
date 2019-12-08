@@ -1,12 +1,10 @@
-package com.idk.service;
+package com.idk.receivers;
 
 import com.idk.models.Category;
 import com.idk.models.News;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -23,7 +21,7 @@ public class NewsRepository {
         newsList.add(new News("POLITICS_NEWS", LocalDateTime.now().toLocalDate(), LocalDateTime.now().toLocalDate(), "ProTv", "Basescu", "gagagas", Category.Politics));
         newsList.add(new News("SPORTS_NEWS", LocalDateTime.now().toLocalDate(), LocalDateTime.now().toLocalDate(), "DigiSport", "Basescu", "jfjru", Category.Sports));
         newsList.add(new News("LIFESTYLE_NEWS", LocalDateTime.now().toLocalDate(), LocalDateTime.now().toLocalDate(), "Antena1", "Iliescu", "zxvzv", Category.Lifestyle));
-
+        newsList.add(new News("LIVERPOOL_NEWS", LocalDateTime.now().toLocalDate(), LocalDateTime.now().toLocalDate(), "BBC", "Paul Joyce", "Liverpool 5 - 2 Everton", Category.Sports));
     }
 
     public NewsRepository() {
@@ -52,7 +50,8 @@ public class NewsRepository {
         newsList.removeIf(news -> news.getId().equals(newsId));
     }
 
-    public void increaseNewsCount(String newsId) {
+    public void increaseNewsReadCount(String newsId) {
+        newsReadCount.putIfAbsent(newsId, 0);
         newsReadCount.put(newsId, newsReadCount.get(newsId) + 1);
     }
 
