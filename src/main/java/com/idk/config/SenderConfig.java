@@ -37,4 +37,14 @@ public class SenderConfig {
     public Destination addNewsResponseDestination() {
         return new ActiveMQQueue(DESTINATION_REQUESTED_NEWS_READ);
     }
+
+    @Bean
+    public Destination deleteNewsResponseDestination() {
+        return new ActiveMQQueue(DESTINATION_REQUESTED_NEWS_DELETED);
+    }
+
+    @Bean
+    public Destination updateNewsResponseDestination() {
+        return new ActiveMQQueue(DESTINATION_REQUESTED_NEWS_UPDATED);
+    }
 }

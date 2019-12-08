@@ -35,10 +35,10 @@ public class NewsRepository {
         this.newsList.add(news);
     }
 
-    public void updateNews(String newsId, News news) {
+    public void updateNews(News news) {
         synchronized(newsList) {
             for(int i=0; i < newsList.size(); i++) {
-                if (newsList.get(i).id.equals(newsId)) {
+                if (newsList.get(i).id.equals(news.getId())) {
                     newsList.get(i).setBody(news.getBody());
                     newsList.get(i).setLastModified(LocalDateTime.now().toLocalDate());
                 }

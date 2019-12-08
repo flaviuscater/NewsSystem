@@ -38,6 +38,7 @@ public class ReadNewsReceiver {
         // increase readers count
         foundNews.ifPresent(news -> newsRepository.increaseNewsReadCount(news.getId()));
 
+        // GET Readers count
         System.out.println("Readers count: \n" + newsRepository.getReadersCount(newsId));
 
         jmsTemplate.send(requestedReadNewsDestination, messageCreator -> {

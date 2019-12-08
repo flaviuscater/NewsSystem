@@ -2,6 +2,8 @@ package com.idk.actors;
 
 import com.idk.models.Category;
 import com.idk.models.News;
+import com.idk.senders.NewsReadSender;
+import com.idk.senders.NewsSubscribeSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.jms.JMSException;

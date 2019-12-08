@@ -9,14 +9,14 @@ import org.springframework.jms.support.JmsHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
-
 import javax.jms.Destination;
 import javax.jms.TextMessage;
 
-import static com.idk.constants.NewsConstants.ADD_NEWS_EVENT;
+import static com.idk.constants.NewsConstants.DELETE_NEWS_EVENT;
+import static com.idk.constants.NewsConstants.UPDATE_NEWS_EVENT;
 
 @Service
-public class AddNewsReceiver {
+public class UpdateNewsReceiver {
 
     @Autowired
     NewsRepository newsRepository;
@@ -25,17 +25,18 @@ public class AddNewsReceiver {
     JmsTemplate jmsTemplate;
 
     @Autowired
-    @Qualifier("addNewsResponseDestination")
-    Destination addNewsResponseDestination;
+    @Qualifier("deleteNewsResponseDestination")
+    private Destination requestedDeletedNewsDestination;
 
-    @JmsListener(destination = ADD_NEWS_EVENT, containerFactory = "myFactory")
-    public void addNewsEventHandler(News news, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
-        newsRepository.addNews(news);
-        System.out.println("Current news:" + newsRepository.getNewsList());
+    @JmsListener(destination = UPDATE_NEWS_EVENT, containerFactory = "myFactory")
+    public void deleteNewsEventHandler(News news, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
 
+        newsRepository.updateNews(news);
 
-        jmsTemplate.send(addNewsResponseDestination, messageCreator -> {
-            TextMessage message = messageCreator.createTextMessage("Success");
+        System.out.println("Updated:" + news.getId());
+
+        jmsTemplate.send(requestedDeletedNewsDestination, messageCreator -> {
+            TextMessage message = messageCreator.createTextMessage("Updated Successfully");
             message.setJMSCorrelationID(messageId);
             return message;
         });

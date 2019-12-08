@@ -1,4 +1,4 @@
-package com.idk.actors;
+package com.idk.senders;
 
 import com.idk.models.Category;
 import com.idk.models.News;

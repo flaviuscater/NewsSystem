@@ -1,4 +1,4 @@
-package com.idk.actors;
+package com.idk.senders;
 
 import com.idk.models.News;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,39 +9,42 @@ import org.springframework.stereotype.Component;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.idk.constants.NewsConstants.ADD_NEWS_EVENT;
+import static com.idk.constants.NewsConstants.READ_NEWS_EVENT;
 
 @Component
-public class AddNewsSender {
+public class NewsReadSender {
 
     @Autowired
     JmsTemplate jmsTemplate;
 
     @Autowired
-    @Qualifier("addNewsResponseDestination")
-    Destination addNewsResponseDestination;
+    @Qualifier("readNewsResponseDestination")
+    private Destination requestedReadNewsDestination;
 
-    public String addNews(News news) throws JMSException {
+    public NewsReadSender() {
+    }
+
+    public String readNews(String newsId) throws JMSException {
         final AtomicReference<Message> message = new AtomicReference<>();
 
-        jmsTemplate.convertAndSend(ADD_NEWS_EVENT, news, messagePostProcessor -> {
+        jmsTemplate.convertAndSend(READ_NEWS_EVENT, newsId, messagePostProcessor -> {
             message.set(messagePostProcessor);
             return messagePostProcessor;
         });
 
         String messageId = message.get().getJMSMessageID();
-        System.out.format("Adding news: %s with MessageId=%s\n",
-                news, messageId);
+        System.out.format("Reading news with id=%s with MessageId=%s\n",
+                newsId, messageId);
 
         return messageId;
     }
 
-    public String receiveAddNewsResponse(String correlationId) {
-        String result = (String) jmsTemplate.receiveSelectedAndConvert(addNewsResponseDestination, "JMSCorrelationID = '" + correlationId + "'");
+    public News receiveReadNews(String correlationId) {
+        News result = (News) jmsTemplate.receiveSelectedAndConvert(requestedReadNewsDestination, "JMSCorrelationID = '" + correlationId + "'");
         System.out.format("receive Status=%s for CorrelationId=%s\n", result, correlationId);
         return result;
     }
-
 }

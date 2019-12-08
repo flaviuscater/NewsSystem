@@ -1,6 +1,5 @@
 package com.idk.receivers;
 
-import com.idk.models.News;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.annotation.JmsListener;
@@ -9,14 +8,13 @@ import org.springframework.jms.support.JmsHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
-
 import javax.jms.Destination;
 import javax.jms.TextMessage;
 
-import static com.idk.constants.NewsConstants.ADD_NEWS_EVENT;
+import static com.idk.constants.NewsConstants.*;
 
 @Service
-public class AddNewsReceiver {
+public class DeleteNewsReceiver {
 
     @Autowired
     NewsRepository newsRepository;
@@ -25,17 +23,18 @@ public class AddNewsReceiver {
     JmsTemplate jmsTemplate;
 
     @Autowired
-    @Qualifier("addNewsResponseDestination")
-    Destination addNewsResponseDestination;
+    @Qualifier("deleteNewsResponseDestination")
+    private Destination requestedDeletedNewsDestination;
 
-    @JmsListener(destination = ADD_NEWS_EVENT, containerFactory = "myFactory")
-    public void addNewsEventHandler(News news, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
-        newsRepository.addNews(news);
-        System.out.println("Current news:" + newsRepository.getNewsList());
+    @JmsListener(destination = DELETE_NEWS_EVENT, containerFactory = "myFactory")
+    public void deleteNewsEventHandler(String newsId, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
 
+        newsRepository.deleteNews(newsId);
 
-        jmsTemplate.send(addNewsResponseDestination, messageCreator -> {
-            TextMessage message = messageCreator.createTextMessage("Success");
+        System.out.println("Deleted:" + newsId);
+
+        jmsTemplate.send(requestedDeletedNewsDestination, messageCreator -> {
+            TextMessage message = messageCreator.createTextMessage("Deleted Successfully");
             message.setJMSCorrelationID(messageId);
             return message;
         });

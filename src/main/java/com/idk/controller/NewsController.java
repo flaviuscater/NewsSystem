@@ -30,6 +30,7 @@ public class NewsController {
         return reader.receiveSubscribedNews(messageId);
     }
 
+    // READ BY ID
     @GetMapping("/read")
     public News readNews(@RequestBody News news) throws JMSException {
         String messageId = reader.readNews(news.getId());
@@ -40,5 +41,18 @@ public class NewsController {
     public String addNews(@RequestBody News news) throws JMSException {
         String messageId = editor.addNews(news);
         return editor.receiveAddNewsResponse(messageId);
+    }
+
+    // DELETE BY ID
+    @DeleteMapping("/delete")
+    public String deleteNews(@RequestBody News news) throws JMSException {
+        String messageId = editor.deleteNews(news.getId());
+        return editor.receiveDeleteNewsResponse(messageId);
+    }
+
+    @PutMapping("/update")
+    public String updateNews(@RequestBody News news) throws JMSException {
+        String messageId = editor.updateNews(news);
+        return editor.receiveUpdateNewsResponse(messageId);
     }
 }
