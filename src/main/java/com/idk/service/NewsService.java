@@ -3,13 +3,19 @@ package com.idk.service;
 import com.idk.models.Category;
 import com.idk.models.News;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.support.JmsHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import javax.jms.Destination;
+import javax.jms.TextMessage;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.idk.constants.NewsConstants.DESTINATION_NEWS_SUBSCRIBE;
 
 @Service
 public class NewsService {
@@ -19,6 +25,10 @@ public class NewsService {
 
     @Autowired
     JmsTemplate jmsTemplate;
+
+    @Autowired
+    @Qualifier("statusDestination")
+    private Destination statusDestination;
 
     @JmsListener(destination = "Add_News_Event", containerFactory = "myFactory")
     public void addNewsEventHandler(News news) {
@@ -35,12 +45,21 @@ public class NewsService {
         newsRepository.deleteNews(newsId);
     }
 
-    @JmsListener(destination = "Subscribe_News_Event", containerFactory = "myFactory")
-    public void subscribeToNewsletterEventHandler(Category category) {
-        List<News> newsList = newsRepository.getNewsList();
-        newsList.stream()
-                .filter(news -> news.getCategory().equals(category))
-                .forEach(news -> newsRepository.increaseNewsCount(news.getId()));
+    @JmsListener(destination = DESTINATION_NEWS_SUBSCRIBE, containerFactory = "myFactory")
+    public void subscribeToNewsEventHandler(Category category, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
+        System.out.format("Received subscribe to news with category='%s' with MessageId='%s'", category, messageId);
+
+//        List<News> newsList = newsRepository.getNewsList();
+//        List<News> filteredNews = newsList.stream()
+//                .filter(news -> news.getCategory().equals(category)).collect(Collectors.toList());
+//
+//        filteredNews.forEach(news -> newsRepository.increaseNewsCount(news.getId()));
+
+        jmsTemplate.send(statusDestination, messageCreator -> {
+            TextMessage message = messageCreator.createTextMessage("Accepted");
+            message.setJMSCorrelationID(messageId);
+            return message;
+        });
 
         //jmsTemplate.convertAndSend("Count_News_Read", Arrays.asList());
     }

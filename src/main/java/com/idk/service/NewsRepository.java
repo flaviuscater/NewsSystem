@@ -1,7 +1,12 @@
 package com.idk.service;
 
+import com.idk.models.Category;
 import com.idk.models.News;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.annotation.PostConstruct;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -11,6 +16,15 @@ public class NewsRepository {
     private List<News> newsList = Collections.synchronizedList(new ArrayList<>());
 
     Map<String, Integer> newsReadCount = Collections.synchronizedMap(new HashMap<>());
+
+    @PostConstruct
+    public void init() {
+        //newsList.add(String id, LocalDate publishedDate, LocalDate lastModified, String source, String author, String body, Category category);
+        newsList.add(new News("POLITICS_NEWS", LocalDateTime.now().toLocalDate(), LocalDateTime.now().toLocalDate(), "ProTv", "Basescu", "gagagas", Category.Politics));
+        newsList.add(new News("SPORTS_NEWS", LocalDateTime.now().toLocalDate(), LocalDateTime.now().toLocalDate(), "DigiSport", "Basescu", "jfjru", Category.Sports));
+        newsList.add(new News("LIFESTYLE_NEWS", LocalDateTime.now().toLocalDate(), LocalDateTime.now().toLocalDate(), "Antena1", "Iliescu", "zxvzv", Category.Lifestyle));
+
+    }
 
     public NewsRepository() {
     }

@@ -1,8 +1,9 @@
 package com.idk.models;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class News {
+public class News implements Serializable {
 
     public String id;
     private LocalDate publishedDate;

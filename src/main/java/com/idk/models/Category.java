@@ -1,6 +1,8 @@
 package com.idk.models;
 
-public enum Category {
+import java.io.Serializable;
+
+public enum Category implements Serializable {
     Sports,
     Politics,
     Lifestyle
